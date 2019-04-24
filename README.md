@@ -6,6 +6,10 @@ This is a Java / Maven / Spring Boot application which exposes some REST service
 The service is a simple *Products* get REST service.
 The REST endpoints are defined in ```com.cc.products.controller.ProductController``` on **port 8080**. (see below)
 
+## URL for service
+http://localhost:8080/categories/600001506/products/
+or via swagger
+http://localhost:8080/swagger-ui.html
 
 Features in this application : 
 * Full integration with the latest **Spring** Framework: inversion of control, dependency injection, etc.
@@ -37,3 +41,8 @@ Once the application runs you should see something like this
 ## UNIT & Integration Tests.
 
 Unit tests for the controller and service classes exits along with an API Test.
+
+## Documentation
+API Documentation available under on application startup:
+
+http://localhost:8080/swagger-ui.html
