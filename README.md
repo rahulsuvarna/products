@@ -9,7 +9,7 @@ The REST endpoints are defined in ```com.cc.products.controller.ProductControlle
 ## URL for service
 http://localhost:8080/categories/600001506/products/
 or via swagger
-http://localhost:8080/swagger-ui.html
+http://localhost:8080/swagger-ui.html#!/product-controller/getProductsUsingGET
 
 Features in this application : 
 * Full integration with the latest **Spring** Framework: inversion of control, dependency injection, etc.

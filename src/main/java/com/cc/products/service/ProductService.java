@@ -40,7 +40,7 @@ public class ProductService implements IProductService {
         List<Product> lOfPriceReducedProducts = jlGateway.getAllProductForCategory(categoryId).stream()
                 .filter(reduced ? ProductUtils::isProductPriceReduced : p -> true) // filter the product If price reduced
                 .map(productMapper(labelType)) // map JLProduct to Product
-                .sorted(comparing(Product::getReduction)) // sort the list based on reduction
+                .sorted(comparing(Product::getReduction).reversed()) // sort the list based on reduction
                 .collect(Collectors.toList());
         LOGGER.debug("returning getProductsForCategory() with product size: {}", lOfPriceReducedProducts.size());
         return lOfPriceReducedProducts;
