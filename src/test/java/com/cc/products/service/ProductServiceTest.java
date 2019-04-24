@@ -39,7 +39,7 @@ public class ProductServiceTest {
 
     @Test
     public void getProductsForCategory_OneFound() {
-        List<JLProduct> list = new ArrayList<>(Arrays.asList(JLProduct.builder().productId("1234").title("Some Title")
+        List<JLProduct> list = new ArrayList<>(Collections.singletonList(JLProduct.builder().productId("1234").title("Some Title")
                 .price(Price.builder().was(BigDecimal.TEN).now(BigDecimal.ONE).currency(Currency.getInstance("GBP")).build()).build()));
         given(jlGateway.getAllProductForCategory(any())).willReturn(list);
         List<Product> actual = productService.getProductsForCategory("12345678", "ShowWasNow ", true);
@@ -49,8 +49,39 @@ public class ProductServiceTest {
     }
 
     @Test
+    public void getProductsForCategory_MultipleFound_Sorted() {
+        JLProduct product1 = JLProduct.builder()
+                .productId("1234")
+                .title("Some Title 1")
+                .price(Price.builder()
+                        .was(BigDecimal.TEN)
+                        .now(BigDecimal.ONE)
+                        .currency(Currency.getInstance("GBP"))
+                        .build())
+                .build();
+        JLProduct product2 = JLProduct.builder()
+                .productId("5678")
+                .title("Some Title 2")
+                .price(Price.builder()
+                        .was(BigDecimal.valueOf(100))
+                        .now(BigDecimal.ONE)
+                        .currency(Currency.getInstance("GBP"))
+                        .build())
+                .build();
+
+        List<JLProduct> list = new ArrayList<>(Arrays.asList(product1, product2));
+        given(jlGateway.getAllProductForCategory(any())).willReturn(list);
+        List<Product> actual = productService.getProductsForCategory("12345678", "ShowWasNow ", true);
+        assertThat(actual, hasSize(2));
+        assertThat(actual.get(0).getProductId(), is("5678"));
+        assertThat(actual.get(0).getTitle(), is("Some Title 2"));
+        assertThat(actual.get(1).getProductId(), is("1234"));
+        assertThat(actual.get(1).getTitle(), is("Some Title 1"));
+    }
+
+    @Test
     public void getProductsForCategory_NoneFound_WithAReducedPrice() {
-        List<JLProduct> list = new ArrayList<>(Arrays.asList(JLProduct.builder().productId("1234").price(Price.builder()
+        List<JLProduct> list = new ArrayList<>(Collections.singletonList(JLProduct.builder().productId("1234").price(Price.builder()
                 .was(null).now(BigDecimal.ONE).currency(Currency.getInstance("GBP")).build()).build()));
         given(jlGateway.getAllProductForCategory(any())).willReturn(list);
         List<Product> actual = productService.getProductsForCategory("12345678", "ShowWasNow ", true);
@@ -59,7 +90,7 @@ public class ProductServiceTest {
 
     @Test
     public void getProductsForCategory_NoneFound_WithSamePrice() {
-        List<JLProduct> list = new ArrayList<>(Arrays.asList(JLProduct.builder().productId("1234").price(Price.builder()
+        List<JLProduct> list = new ArrayList<>(Collections.singletonList(JLProduct.builder().productId("1234").price(Price.builder()
                 .was(BigDecimal.ONE).now(BigDecimal.ONE).currency(Currency.getInstance("GBP")).build()).build()));
         given(jlGateway.getAllProductForCategory(any())).willReturn(list);
         List<Product> actual = productService.getProductsForCategory("12345678", "ShowWasNow ", true);
@@ -68,9 +99,9 @@ public class ProductServiceTest {
 
     @Test
     public void getProductsForCategory_Found_WithProperColourSwatch() {
-        List<JLProduct> list = new ArrayList<>(Arrays.asList(JLProduct.builder().productId("1234")
+        List<JLProduct> list = new ArrayList<>(Collections.singletonList(JLProduct.builder().productId("1234")
                 .price(Price.builder().now(BigDecimal.ONE).was(BigDecimal.TEN).currency(Currency.getInstance("GBP")).build())
-                .lOfJLColorSwatches(Arrays.asList(JLColorSwatches.builder().color("Blue").skuId("32948348").build())).build()));
+                .lOfJLColorSwatches(Collections.singletonList(JLColorSwatches.builder().color("Blue").skuId("32948348").build())).build()));
         given(jlGateway.getAllProductForCategory(any())).willReturn(list);
         List<Product> actual = productService.getProductsForCategory("12345678", "ShowWasNow ", true);
         assertThat(actual, hasSize(1));
@@ -80,9 +111,9 @@ public class ProductServiceTest {
 
     @Test
     public void getProductsForCategory_Found_WithoutColourSwatch() {
-        List<JLProduct> list = new ArrayList<>(Arrays.asList(JLProduct.builder().productId("1234")
+        List<JLProduct> list = new ArrayList<>(Collections.singletonList(JLProduct.builder().productId("1234")
                 .price(Price.builder().now(BigDecimal.ONE).was(BigDecimal.TEN).currency(Currency.getInstance("GBP")).build())
-                .lOfJLColorSwatches(Arrays.asList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
+                .lOfJLColorSwatches(Collections.singletonList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
         given(jlGateway.getAllProductForCategory(any())).willReturn(list);
         List<Product> actual = productService.getProductsForCategory("12345678", "ShowWasNow ", true);
         assertThat(actual, hasSize(1));
@@ -92,9 +123,9 @@ public class ProductServiceTest {
 
     @Test
     public void getProductsForCategory_Found_NowPriceBelowTen() {
-        List<JLProduct> list = new ArrayList<>(Arrays.asList(JLProduct.builder().productId("1234")
+        List<JLProduct> list = new ArrayList<>(Collections.singletonList(JLProduct.builder().productId("1234")
                 .price(Price.builder().now(BigDecimal.ONE).was(BigDecimal.TEN).currency(Currency.getInstance("GBP")).build())
-                .lOfJLColorSwatches(Arrays.asList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
+                .lOfJLColorSwatches(Collections.singletonList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
         given(jlGateway.getAllProductForCategory(any())).willReturn(list);
         List<Product> actual = productService.getProductsForCategory("12345678", "ShowWasNow ", true);
         assertThat(actual, hasSize(1));
@@ -104,9 +135,9 @@ public class ProductServiceTest {
 
     @Test
     public void getProductsForCategory_Found_NowPriceAboveTen() {
-        List<JLProduct> list = new ArrayList<>(Arrays.asList(JLProduct.builder().productId("1234")
+        List<JLProduct> list = new ArrayList<>(Collections.singletonList(JLProduct.builder().productId("1234")
                 .price(Price.builder().now(BigDecimal.valueOf(20.21)).was(BigDecimal.valueOf(21.21)).currency(Currency.getInstance("GBP")).build())
-                .lOfJLColorSwatches(Arrays.asList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
+                .lOfJLColorSwatches(Collections.singletonList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
         given(jlGateway.getAllProductForCategory(any())).willReturn(list);
         List<Product> actual = productService.getProductsForCategory("12345678", "ShowWasNow ", true);
         assertThat(actual, hasSize(1));
@@ -116,9 +147,9 @@ public class ProductServiceTest {
 
     @Test
     public void getProductsForCategory_Found_DefaultPriceLabel() {
-        List<JLProduct> list = new ArrayList<>(Arrays.asList(JLProduct.builder().productId("1234")
+        List<JLProduct> list = new ArrayList<>(Collections.singletonList(JLProduct.builder().productId("1234")
                 .price(Price.builder().now(BigDecimal.valueOf(20.21)).was(BigDecimal.valueOf(21.21)).currency(Currency.getInstance("GBP")).build())
-                .lOfJLColorSwatches(Arrays.asList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
+                .lOfJLColorSwatches(Collections.singletonList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
         given(jlGateway.getAllProductForCategory(any())).willReturn(list);
         List<Product> actual = productService.getProductsForCategory("12345678", "ShowWasNow ", true);
         assertThat(actual, hasSize(1));
@@ -129,13 +160,13 @@ public class ProductServiceTest {
 
     @Test
     public void getProductsForCategory_ShowNowWasThen2PriceLabel() {
-        List<JLProduct> list = new ArrayList<>(Arrays.asList(JLProduct.builder().productId("1234")
+        List<JLProduct> list = new ArrayList<>(Collections.singletonList(JLProduct.builder().productId("1234")
                 .price(Price.builder().now(BigDecimal.valueOf(20.21))
                         .was(BigDecimal.valueOf(21.21))
                         .then1(BigDecimal.valueOf(22.35))
                         .then2(null)
                         .currency(Currency.getInstance("GBP")).build())
-                .lOfJLColorSwatches(Arrays.asList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
+                .lOfJLColorSwatches(Collections.singletonList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
         given(jlGateway.getAllProductForCategory(any())).willReturn(list);
         List<Product> actual = productService.getProductsForCategory("12345678", "ShowWasThenNow", true);
         assertThat(actual, hasSize(1));
@@ -146,13 +177,13 @@ public class ProductServiceTest {
 
     @Test
     public void getProductsForCategory_ShowNowWasThen1PriceLabel() {
-        List<JLProduct> list = new ArrayList<>(Arrays.asList(JLProduct.builder().productId("1234")
+        List<JLProduct> list = new ArrayList<>(Collections.singletonList(JLProduct.builder().productId("1234")
                 .price(Price.builder().now(BigDecimal.valueOf(20.21))
                         .was(BigDecimal.valueOf(21.21))
                         .then1(BigDecimal.valueOf(22.35))
                         .then2(null)
                         .currency(Currency.getInstance("GBP")).build())
-                .lOfJLColorSwatches(Arrays.asList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
+                .lOfJLColorSwatches(Collections.singletonList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
         given(jlGateway.getAllProductForCategory(any())).willReturn(list);
         List<Product> actual = productService.getProductsForCategory("12345678", "ShowWasThenNow", true);
         assertThat(actual, hasSize(1));
@@ -163,13 +194,13 @@ public class ProductServiceTest {
 
     @Test
     public void getProductsForCategory_ShowPercDscountPriceLabel() {
-        List<JLProduct> list = new ArrayList<>(Arrays.asList(JLProduct.builder().productId("1234")
+        List<JLProduct> list = new ArrayList<>(Collections.singletonList(JLProduct.builder().productId("1234")
                 .price(Price.builder().now(BigDecimal.valueOf(20.21))
                         .was(BigDecimal.valueOf(21.21))
                         .then1(BigDecimal.valueOf(22.35))
                         .then2(null)
                         .currency(Currency.getInstance("GBP")).build())
-                .lOfJLColorSwatches(Arrays.asList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
+                .lOfJLColorSwatches(Collections.singletonList(JLColorSwatches.builder().color("Olive").skuId("32948348").build())).build()));
         given(jlGateway.getAllProductForCategory(any())).willReturn(list);
         List<Product> actual = productService.getProductsForCategory("12345678", "ShowPercDscount", true);
         assertThat(actual, hasSize(1));
