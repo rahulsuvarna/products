@@ -6,6 +6,8 @@ import com.cc.products.dto.ColorSwatches;
 import com.cc.products.dto.Product;
 import com.cc.products.service.utils.ColorSwatchTransformer;
 import com.cc.products.service.utils.ProductUtils;
+import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ import static java.util.Comparator.comparing;
  * Product Service class
  */
 @Component
-public class ProductService implements IProductService {
+public class ProductService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(ProductService.class);
 
@@ -34,7 +36,7 @@ public class ProductService implements IProductService {
         this.jlGateway = jlGateway;
     }
 
-    public List<Product> getProductsForCategory(final @NotNull String categoryId, final String labelType, boolean reduced) {
+    public Single<List<Product>> getProductsForCategory(final @NotNull String categoryId, final String labelType, boolean reduced) {
 
         LOGGER.debug("getProductsForCategory() with categoryIs: {} and labelType: {}", categoryId, labelType);
         List<Product> lOfPriceReducedProducts = jlGateway.getAllProductForCategory(categoryId).stream()
@@ -43,7 +45,7 @@ public class ProductService implements IProductService {
                 .sorted(comparing(Product::getReduction).reversed()) // sort the list based on reduction
                 .collect(Collectors.toList());
         LOGGER.debug("returning getProductsForCategory() with product size: {}", lOfPriceReducedProducts.size());
-        return lOfPriceReducedProducts;
+        return Single.just(lOfPriceReducedProducts).subscribeOn(Schedulers.io());
     }
 
     private Function<JLProduct, Product> productMapper(String labelType) {

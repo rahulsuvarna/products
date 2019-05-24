@@ -3,8 +3,6 @@ package com.cc.jlproduct;
 import com.cc.jlproduct.dto.JLColorSwatches;
 import com.cc.jlproduct.dto.JLProduct;
 import com.cc.jlproduct.dto.Price;
-import javafx.util.converter.CurrencyStringConverter;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
